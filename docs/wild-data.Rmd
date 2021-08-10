@@ -1,0 +1,103 @@
+---
+title: "Exploring Wild Data"
+author: "Paloma Cartwright"
+date: "10/08/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(here)
+```
+
+## Exploring the Wild Data about Mack Creek Salamander & Cutthroat Trout
+
+#### Reading in the dataset and updating the column names to lower_snake_case 
+
+```{r}
+
+mack_verts <- read_csv(here::here("data", "AS00601.csv"), skip = 1) %>% 
+  clean_names()
+```
+
+#### Exploring the dataset 
+
+```{r}
+# Store the 5th value in the weight column 
+mc_wt_5 <- mack_verts$weight[5]
+mc_wt_5
+
+# Store the 8th to 20th values in the length1 column 
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+
+# Store everything in sample date as a vector 
+# Commented this out because it was 1000 lines of output
+# mc_dates <- mack_verts$sampledate
+# mc_dates
+```
+
+#### Making a Salamander Subset 
+
+```{r}
+
+mc_salamanders <- mack_verts %>% 
+  filter(species == "DITE")
+
+```
+
+#### Make a Scatterplot 
+
+Scatterplot of Pacific Giant Salamander Data
+```{r}
+
+ggplot(data = mc_salamanders, aes(x = length1, y = weight)) +
+  geom_point(aes(color = length1)) +
+  scale_color_gradient(low="black", high="blue") +
+  labs(title = "Snout-vent Length versus Weight of Pacific Giant Salamanders",
+       x = "Snout-vent Length (mm)", 
+       y = "Weight (g)", 
+       color = "Length")
+
+ggsave(here::here("figs", "salamander_size.png"))
+
+```
+
+Source: Gregory, S.V. and I. Arismendi. 2020. Aquatic Vertebrate Population Study in Mack Creek, Andrews Experimental Forest, 1987 to present ver 14. Environmental Data Initiative. https://doi.org/10.6073/pasta/7c78d662e847cdbe33584add8f809165 (Accessed 2021-08-10).
+
+
+#### Make a Cutthroat Subset 
+
+```{r}
+
+mc_trout <- mack_verts %>% 
+  filter(species == "ONCL")
+
+```
+
+#### Make a Scatterplot 
+
+Scatterplot of Cutthroat Trout Data 
+
+```{r}
+
+ggplot(data = mc_trout, aes(x = length1, y = weight)) +
+  geom_point(aes(color = reach)) + 
+  scale_color_manual(values=c("purple", "blue", "darkgreen")) +
+  labs(title = "Length vs Weight of Cutthroat Trout", 
+       x = "Length (mm)",
+       y = "Weight (g)",
+       color = "Length Gradient") +
+  facet_wrap(~reach)
+  
+
+ggsave(here::here("figs", "cutthroat_size.png"))
+
+```
+
+
+
+
+
